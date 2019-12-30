@@ -1,0 +1,145 @@
+SUMMARY
+
+1 Architecture
+	1.1 ActorGame
+	1.2 GameEntity
+	1.3 NullPointerException and IllegalArgumentException
+2 Bike
+	2.1 Bike
+3 Triggers
+	3.1 Triggers
+	3.2 FinishLine
+	3.3 Spikes
+	3.4 TrapSpikes 	
+	3.5 SpikesUp
+4 InfoDisplay
+	4.1 InfoDisplay
+	4.2 coinScore
+	4.3 SpeedCounter
+5 Terrain
+	5.1 Terrain
+	5.2 NoFrictionTerrain
+6 Others implmentation
+	6.1 Scale
+	6.2 Pendulum	
+	6.3 Win animation
+
+
+1 ARCHITECTURE
+
+1.1 ACTORGAME
+
+-Getter for the viewCandidate: check if you have win (viewCandidate == finishLine) or not (viewCandidate == bike)
+-2 more ArrayList: toAdd and toRemove. At each update, we add and remove the GameEntity contained in these ArrayList into the main Arraylist, then we clear them
+-3 public constraintBuilder creator: we need a world to create them and we don't want to create a getWorld()
+
+1.2 GameEntity
+-A setPartBuilder, which will be useful to create an hitbox
+-Use of the overload to have different setPartBuilder
+
+1.3 NullPointerException and IllegalArgumentException
+-At each subclasses of GameEntity's constructor, we check the arguments to see if there's not a reference to a null object or to a unreachable value (ex: a negative height)
+-We know that our classes are well initialised so we do not need to check every methode from all of the gameEntity
+
+2 BIKE
+
+2.1 BIKE
+-two boolean: hit and touch: hit will be true just at the moment when the bike will touch something which isn't ghosted, and it will change the boolean touche to true
+-So afterwards the boolean hit will be false again but touch will be true forever
+-Creation of the shape with different locations, return a different location depending on the boolean
+-GetMotorWheel to get the wheel that will be motorized
+
+
+3 TRIGGERS 
+
+3.1 Trigger
+-extends GameEntity
+-Have a contact listener and a boolean that will check if there was a contact
+-So if there is a contact with a ghost entity (only the bike is a mobile ghost entity), so the bike, the boolean will turn itself into true
+-two Getters for the boolean and the contact listener
+
+3.2 FinishLine
+-inherit from trigger
+-have an imageGraphic of the finishline and a textgraphic if you win  
+-if there is a contact between the biker and the finishLine the textMessage will appear
+
+3.3 Spikes
+-inherits trigger
+-has a bike in attribut. When there is a contact we put the power of the two wheels at 0.f so it stuck the bike
+
+3.4 TrapSpikes
+-it's a trap made of a trigger that, if activated, make crates fall down.
+-it's linked with spikes that will stop the bike
+-it inherits from trigger and had a spike, 3 crates and a blocker who block the crates
+-when the trigger is activated, we change the trigger's graphic and destroy the blocker so the crates will fall down
+
+3.5 PickUp
+-inherits from trigger
+-when activated, the graphic will not be drawn anymore 
+
+
+4 INFODISPLAY
+
+4.1 InfoDisplay
+-This class is to display info by every type of graphics, and with as many graphics as we want to
+-We have a graphic arrayList which stock every graphic we want to add
+-We have 3 graphics (text, image and shape). They have 2 utility:
+-firstly to check the type of the graphic added to the array with equals and get class
+-secondly to manipulate the reference of the object we wanna add to make a setParent to the entity
+-we initialise our 3 graphics to random value (we don't care about them)
+-we have an add method that can add whatever graphics we want to
+-we have a destroy and a draw method which iterate through the arraylist and draw/destroy every graphic
+
+4.2 CoinScore
+-extends infodisplay
+-CoinScore show if we have collected the coins 
+-There are 3 coins the level, so we have 3 pickup attribute and 3 imageGraphic associated
+-we have also a text graphic that display the "Score" text 
+-we add all graphic to our graphic array and we use it in the draw and destroy method
+-we set the parent of every graphic to the canvas (because they will follow the biker)
+-we cannot create a method in infoDisplay that set the parent to the canvas so  we need to do it manually
+
+4.3 speedCounter
+-Have two graphics: a colored box and a textgraphic that show the motorised wheel
+-So it needs a bike to have the wheel
+-Constructor initialise the bike and the graphics, we add them to the infoDisplay graphic array and we set the parent to the canvas to make the speedCounter follow the biker
+-We use the draw method of infodisplay
+-update: firstly it changes the text of speedDisplay by calculating the value of the speed of the motorised wheel
+-then we check the value of the speed and we change the value of the box's color depending on the speed
+
+
+
+5 TERRAIN
+
+5.1 Terrain:
+-We have in parameter of the construct a point arraylist
+-So we firstly create an entity with the super-constructor, then draw our polyline
+-then we change our shapegraphic and our partbuilder depending on the polyline
+
+5.2: NoFrictionTerrain
+-same as terrainGraphic
+-We change the friction's value, which is at 10f in the Terrain and 0f in the noFrictionTerrain
+
+
+
+6 OTHERS IMPLEMENTATION
+
+6.1 Scale
+-Create a scale which is on an equilateral triangle
+-we create an entity, define the length of the equilateral triangle then create it (scalehelp)
+-Then we create a revoluteConstraintBuilder between the 2 entity to have a scale
+-It's hard because we need to have a good balance between the friction(which will make the scale stick to the ground or not)
+-And we also need to have a good balance in the width and the height (otherwise the weight of the scale will change)
+-So it's not as moduralizable as the others extension, but the goal is to have a decent scale when we create it
+
+6.2 Pendulum
+
+-Pendulum has a weight attached to it
+-We firstly create our entity, set the hitbox and the graphic
+-Then we initialise our weight object
+-Then we attach it to the pendulum
+-Same as the scale, it's not as moduralizable as we would like it to be but it's for keeping a decent Pendulum
+
+6.3 Win animation
+-Our biker has a win animation when he reaches the finish line
+-The camera set the point of view in the finish line when our bike win
